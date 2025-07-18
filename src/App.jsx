@@ -1,16 +1,17 @@
 import './App.css'
 import logo from './assets/Logo.gif';
 import swap from './assets/swap_icon.gif'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import LoadingSpinner from './component/LoadingSpinner';
-//
+
 function App() {
   const [amount, setAmount] = useState(1);
-  const [fromOption, setFromOption] = useState('INR')
-  const [toOption, setToOption] = useState('USD')
+  const [fromOption, setFromOption] = useState('USD')
+  const [toOption, setToOption] = useState('INR')
   const [currencyAPIData, setCurrencyAPIData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const amountRef = useRef(null);
 
   const API_KEY = 'da0ba58ff8598e7f2bbeb6a8';
   const URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/`
@@ -26,7 +27,10 @@ function App() {
       setIsLoading(false)      
     )
   }, [])
-  
+
+  useEffect(() => {
+    amountRef?.current?.focus()
+  }, [isLoading])
 
   useEffect(() => {
       if (currencyAPIData.conversion_rates) {
@@ -36,29 +40,22 @@ function App() {
         console.log(error)
         })
       }
+      amountRef?.current?.focus()
   }, [fromOption])
-
-  // console.log(Object.keys(currencyAPIData?.conversion_rates))
-  // console.log(currencyAPIData.conversion_rates)
-  // console.log(JSON.stringify(currencyAPIData.conversion_rates))
-
 
   const handleChange = e => {
     const {name, value} = e.target;
     switch(name) {
       case 'amount':
         setAmount(value);
-        console.log(value)
         break;
 
       case 'fromCurrency':
         setFromOption(value);
-        console.log(value)
         break;
 
       case 'toCurrency': 
         setToOption(value);
-        console.log(value)
         break;
     }
   }
@@ -77,7 +74,7 @@ function App() {
         <div className="currencyExchangeFields">
           <div className="input_container">
             <label className='input_label'>Amount:</label>
-            <input type='number' name="amount" className='input_field' value={amount} onChange={handleChange} />
+            <input type='number' name="amount" className='input_field' ref={amountRef} value={amount} onChange={handleChange} />
           </div>
 
           <div className="input_container">
@@ -90,9 +87,7 @@ function App() {
               })}
           </select>
           </div>
-
           <button className='swapButton' onClick={swapHandle}><img src={swap} alt="swap_icon" /></button>
-      
           <div className="input_container">
             <label className='input_label' >To Currency:</label>
             <select className='input_field' name='toCurrency' value={toOption} onChange={handleChange}>
@@ -105,7 +100,7 @@ function App() {
           </div>
       </div>
       <div className="output">
-        <h2>Converted Amount: <b>{currencyAPIData?.conversion_rates && currencyAPIData?.conversion_rates[toOption] * amount}</b></h2>
+        <h2>Converted Amount: <b>{currencyAPIData?.conversion_rates && currencyAPIData?.conversion_rates[toOption] * amount + ' ' + toOption}</b></h2>
       </div>
       </div>}
     </>

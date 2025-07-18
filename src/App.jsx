@@ -1,5 +1,5 @@
 import './App.css'
-import logo from './assets/logo.gif';
+import logo from './assets/Logo.gif';
 import swap from './assets/swap_icon.gif'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
